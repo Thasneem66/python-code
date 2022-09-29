@@ -1,0 +1,63 @@
+import json
+import boto3
+import base64
+
+def lambda_handler(event, context):
+    for record in event['Records']:
+        payload = base64.b64decode(record['kinesis']['data'])
+        de_serialize_payload = json.loads(payload)
+        print("de_serialize_payload", de_serialize_payload, type(de_serialize_payload))
+
+
+
+import boto3
+import json
+from datetime import datetime
+import calendar
+import random
+import time
+import json
+from faker import Faker
+import uuid
+from time import sleep
+
+my_stream_name = 'kinesisstream'
+
+kinesis_client = boto3.client('kinesis',
+                              region_name='us-east-1',
+                              aws_access_key_id='AKIAX46TG2KQORUW7KGQ',
+                              aws_secret_access_key='o3SCmYsFm2AXWD7rjimXZhZtCiSnNOtGqbv4fP4x'
+                              )
+faker = Faker()
+
+f=open("PatientDisease.csv","r")#to open the file
+content=" "#empty string
+count=0#initializing count to 0
+iteration=0#initializing iteration to 0
+while(content):
+    content=f.readline()#storing the line of a file
+    word1=content.split(',')#splitting the line to words and storing in list
+    with open("PatientDisease.csv","r") as file:#opening products file
+        data = file.readlines()#reading products file and storing a line
+        if(len(word1)>1):#if length of the list is not 0
+            json_data = {
+                    "PatientId":word1[0],
+                    "DiseaseId":word1[1],
+                    "DoctId":word1[2],
+                    "Medicine1":word1[3],
+                    "Medicine2":word1[4],
+                    "Medicine3":word1[3],
+                    "Medicine4":word1[3],
+                    "Medicine5":word1[3],
+                    "StartDate":word1[2],
+                    "EndDate":word1[2],
+                    "Payment":word1[1]
+                }
+        print(json_data)
+        print("Changed")
+
+        put_response = kinesis_client.put_record(
+            StreamName=my_stream_name,
+            Data=json.dumps(json_data),
+            PartitionKey='name')
+        print(put_response)
